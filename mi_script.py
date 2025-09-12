@@ -2,8 +2,8 @@ import requests
 import os
 
 # 🔑 Configuración (poné tu token y chat_id en Secrets de GitHub)
-TELEGRAM_TOKEN = os.getenv("8120402417:AAGzPpQ-ylO-dqS_hB9gHxYkrB0x_pHpwOI")
-TELEGRAM_CHAT_ID = os.getenv("1914342776")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # API de cotización del dólar
 url = "https://dolarapi.com/v1/dolares/oficial"
