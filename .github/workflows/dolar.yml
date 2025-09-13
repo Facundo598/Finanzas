@@ -2,8 +2,7 @@ name: Dólar a Telegram
 
 on:
   schedule:
-    #- cron: '0 * * * *'   # cada hora
-    - cron: "*/1 * * * *"  # cada minuto
+    - cron: '0 * * * *'   # cada hora
   workflow_dispatch:       # también podés lanzarlo a mano
 
 jobs:
