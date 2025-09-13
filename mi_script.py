@@ -38,7 +38,6 @@ df['MA15'] = df['Merval'].rolling(window=15).mean()
 
 # 🔹 Detectar cruce en el último período
 ultimos = df.tail(2)
-
 hma_anterior = ultimos['HMA10'].iloc[0]
 hma_actual = ultimos['HMA10'].iloc[1]
 ma_anterior = ultimos['MA15'].iloc[0]
@@ -48,4 +47,27 @@ if hma_anterior < ma_anterior and hma_actual > ma_actual:
     enviar_mensaje("📈 ¡MERVAL Cruce alcista! La HMA10 cruzó hacia arriba la MA15.")
 elif hma_anterior > ma_anterior and hma_actual < ma_actual:
     enviar_mensaje("📉 ¡MERVAL Cruce bajista! La HMA10 cruzó hacia abajo la MA15.")
+
+# 🔹 Función para calcular RSI
+def RSI(series, period=14):
+    delta = series.diff()
+    ganancias = delta.where(delta > 0, 0)
+    perdidas = -delta.where(delta < 0, 0)
+
+    media_gan = ganancias.rolling(period).mean()
+    media_perd = perdidas.rolling(period).mean()
+
+    rs = media_gan / media_perd
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+
+# 🔹 Calcular RSI 14
+df['RSI'] = RSI(df['Merval'], 14)
+rsi_actual = df['RSI'].iloc[-1]
+
+# 🔹 Mensaje solo en sobrecompra o sobreventa
+if rsi_actual > 70:
+    enviar_mensaje(f"⚠️ ¡MERVAL RSI {rsi_actual:.2f}! Sobrecompra → posible señal bajista")
+elif rsi_actual < 30:
+    enviar_mensaje(f"✅ ¡MERVAL RSI {rsi_actual:.2f}! Sobreventa → posible señal alcista")
 
