@@ -15,7 +15,8 @@ jobs:
         with:
           python-version: '3.10'
       - name: Instalar dependencias
-        run: pip install requests
+        run: pip install requests yfinance pandas numpy
+        
       - name: Ejecutar script
         run: python mi_script.py
         env:
