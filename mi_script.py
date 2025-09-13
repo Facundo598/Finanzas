@@ -1,25 +1,20 @@
 import requests
 import os
 
-# 🔑 Configuración (poné tu token y chat_id en Secrets de GitHub)
+# 🔑 Configuración (tomamos token y chat_id de Secrets)
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-# API de cotización del dólar
-url = "https://dolarapi.com/v1/dolares/oficial"
-
-try:
-    response = requests.get(url, timeout=10)
-    data = response.json()
-
-    precio = data.get("venta", "N/A")
-    fecha = data.get("fecha", "N/A")
-
-    mensaje = f"💵 Dólar oficial\nPrecio venta: ${precio}\nFecha: {fecha}"
-
-except Exception as e:
-    mensaje = f"Error al consultar la API: {e}"
+# Mensaje de prueba
+mensaje = "Hola grupo, esto es un mensaje de prueba 🚀"
 
 # Enviar a Telegram
 telegram_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-requests.post(telegram_url, data={"chat_id": TELEGRAM_CHAT_ID, "text": mensaje})
+response = requests.post(telegram_url, data={"chat_id": TELEGRAM_CHAT_ID, "text": mensaje})
+
+# Mostrar resultado
+if response.status_code == 200:
+    print("Mensaje enviado correctamente ✅")
+else:
+    print("Error al enviar mensaje ❌", response.text)
+
