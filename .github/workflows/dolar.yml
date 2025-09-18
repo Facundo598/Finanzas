@@ -6,8 +6,8 @@ permissions:
 
 on:
   schedule:
-    - cron: '0 * * * *'   # cada hora
-  workflow_dispatch:       # también se puede lanzar manualmente
+    - cron: '0 14-20 * * 1-5'   # cada hora desde 11am a 17hs Argentina, lunes a viernes
+  workflow_dispatch:             # también se puede lanzar manualmente
 
 jobs:
   run-script:
