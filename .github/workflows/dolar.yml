@@ -1,24 +1,40 @@
-name: Dólar a Telegram
+name: Merval a Telegram
 
 on:
   schedule:
     - cron: '0 * * * *'   # cada hora
-  workflow_dispatch:       # también podés lanzarlo a mano
+  workflow_dispatch:       # también se puede lanzar manualmente
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣ Clonar el repositorio
       - uses: actions/checkout@v3
+
+      # 2️⃣ Configurar Python 3.10
       - name: Configurar Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+
+      # 3️⃣ Instalar dependencias necesarias
       - name: Instalar dependencias
         run: pip install requests yfinance pandas numpy
-        
-      - name: Ejecutar script
+
+      # 4️⃣ Ejecutar script
+      - name: Ejecutar mi_script.py
         run: python mi_script.py
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      # 5️⃣ Guardar estado actualizado en el repositorio
+      - name: Guardar estado actualizado
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add estado.json
+          git commit -m "Actualizar estado RSI y HMA" || echo "No hay cambios para commitear"
+          git push
