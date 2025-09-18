@@ -79,7 +79,7 @@ def RSI(series, period=14):
 df['RSI'] = RSI(df['Merval'], 14)
 rsi_actual = df['RSI'].iloc[-1]
 
-# 🔹 Mensaje solo en primer cruce de sobrecompra/sobreventa
+# 🔹 Mensaje en primer cruce de sobrecompra/sobreventa o retorno a zona normal
 if rsi_actual > 70:
     if estado["RSI_estado"] != "sobrecompra":
         enviar_mensaje(f"⚠️ ¡MERVAL RSI {rsi_actual:.2f}! Sobrecompra → posible señal bajista")
@@ -89,10 +89,11 @@ elif rsi_actual < 30:
         enviar_mensaje(f"✅ ¡MERVAL RSI {rsi_actual:.2f}! Sobreventa → posible señal alcista")
         estado["RSI_estado"] = "sobreventa"
 else:
+    # RSI vuelve a zona normal
+    if estado["RSI_estado"] in ["sobrecompra", "sobreventa"]:
+        enviar_mensaje(f"ℹ️ ¡MERVAL RSI {rsi_actual:.2f}! Volvió a zona normal (30-70)")
     estado["RSI_estado"] = "normal"
 
 # 🔹 Guardar estado actualizado
 with open(archivo_estado, "w") as f:
     json.dump(estado, f)
-
-
