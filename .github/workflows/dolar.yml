@@ -6,8 +6,9 @@ permissions:
 
 on:
   schedule:
-    - cron: '0 14-20 * * 1-5'   # cada hora desde 11am a 17hs Argentina, lunes a viernes
-  workflow_dispatch:             # también se puede lanzar manualmente
+    # Cada hora de 11 a 17 hs Argentina (UTC-3), lunes a viernes
+    - cron: '0 14-20 * * 1-5'
+  workflow_dispatch:  # Permite ejecución manual
 
 jobs:
   run-script:
@@ -27,7 +28,7 @@ jobs:
       - name: Instalar dependencias
         run: pip install requests yfinance pandas numpy matplotlib
 
-      # 4️⃣ Ejecutar script
+      # 4️⃣ Ejecutar el script de Merval
       - name: Ejecutar mi_script.py
         run: python mi_script.py
         env:
@@ -41,8 +42,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git add estado.json
           if ! git diff --cached --quiet; then
-            git commit -m "Actualizar estado RSI y HMA"
+            git commit -m "Actualizar estado HMA"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           else
             echo "No hay cambios en estado.json, no se hace commit"
-          fi
