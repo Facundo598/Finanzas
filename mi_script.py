@@ -5,7 +5,7 @@ import requests
 import os
 import json
 import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 # 📌 Configuración de Telegram desde Secrets
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
@@ -30,8 +30,9 @@ if os.path.exists(archivo_estado):
 else:
     estado = {"HMA_estado": "normal"}
 
-# 🔹 Fechas: último año hasta hoy
-hoy = datetime.today()
+# 🔹 Fechas: último año hasta hoy (hora Argentina UTC-3)
+hoy_arg = datetime.now(timezone.utc) - timedelta(hours=3)
+hoy = hoy_arg.replace(hour=0, minute=0, second=0, microsecond=0)
 hace_un_ano = hoy - timedelta(days=365)
 
 # 🔹 Descargar datos del Merval
