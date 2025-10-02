@@ -28,7 +28,7 @@ if os.path.exists(archivo_estado):
     with open(archivo_estado, "r") as f:
         estado = json.load(f)
 else:
-    estado = {"RSI_estado": "normal", "HMA_estado": "normal"}
+    estado = {"HMA_estado": "normal"}
 
 # 🔹 Fechas: último año hasta hoy
 hoy = datetime.today()
@@ -100,76 +100,7 @@ elif hma_anterior > ma_anterior and hma_actual < ma_actual:
 else:
     estado["HMA_estado"] = "normal"
 
-# 🔹 Función RSI
-def RSI(series, period=14):
-    delta = series.diff()
-    ganancias = delta.where(delta > 0, 0)
-    perdidas = -delta.where(delta < 0, 0)
-    media_gan = ganancias.rolling(period).mean()
-    media_perd = perdidas.rolling(period).mean()
-    rs = media_gan / media_perd
-    rsi = 100 - (100 / (1 + rs))
-    return rsi
-
-df['RSI'] = RSI(df['Merval'], 14)
-rsi_actual = df['RSI'].iloc[-1]
-
-# 🔹 Mensaje RSI con control de estado y gráficos
-if rsi_actual > 70:
-    if estado["RSI_estado"] != "sobrecompra":
-        enviar_mensaje(f"⚠️ ¡MERVAL RSI {rsi_actual:.2f}! Sobrecompra → posible señal bajista")
-        estado["RSI_estado"] = "sobrecompra"
-
-        # Gráfico RSI
-        plt.figure(figsize=(10,5))
-        plt.plot(df.index, df['RSI'], label="RSI 14", color="blue")
-        plt.axhline(70, color="red", linestyle="--", label="Sobrecompra")
-        plt.axhline(30, color="green", linestyle="--", label="Sobreventa")
-        plt.title("RSI del MERVAL")
-        plt.legend()
-        plt.grid(True)
-        ruta_rsi = "rsi_merval.png"
-        plt.savefig(ruta_rsi)
-        plt.close()
-        enviar_imagen(ruta_rsi, caption="📊 RSI del MERVAL")
-
-elif rsi_actual < 30:
-    if estado["RSI_estado"] != "sobreventa":
-        enviar_mensaje(f"✅ ¡MERVAL RSI {rsi_actual:.2f}! Sobreventa → posible señal alcista")
-        estado["RSI_estado"] = "sobreventa"
-
-        # Gráfico RSI
-        plt.figure(figsize=(10,5))
-        plt.plot(df.index, df['RSI'], label="RSI 14", color="blue")
-        plt.axhline(70, color="red", linestyle="--", label="Sobrecompra")
-        plt.axhline(30, color="green", linestyle="--", label="Sobreventa")
-        plt.title("RSI del MERVAL")
-        plt.legend()
-        plt.grid(True)
-        ruta_rsi = "rsi_merval.png"
-        plt.savefig(ruta_rsi)
-        plt.close()
-        enviar_imagen(ruta_rsi, caption="📊 RSI del MERVAL")
-
-else:
-    if estado["RSI_estado"] in ["sobrecompra", "sobreventa"]:
-        enviar_mensaje(f"ℹ️ ¡MERVAL RSI {rsi_actual:.2f}! Volvió a zona normal (30-70)")
-
-        # Gráfico RSI
-        plt.figure(figsize=(10,5))
-        plt.plot(df.index, df['RSI'], label="RSI 14", color="blue")
-        plt.axhline(70, color="red", linestyle="--", label="Sobrecompra")
-        plt.axhline(30, color="green", linestyle="--", label="Sobreventa")
-        plt.title("RSI del MERVAL")
-        plt.legend()
-        plt.grid(True)
-        ruta_rsi = "rsi_merval.png"
-        plt.savefig(ruta_rsi)
-        plt.close()
-        enviar_imagen(ruta_rsi, caption="📊 RSI del MERVAL")
-
-    estado["RSI_estado"] = "normal"
-
 # 🔹 Guardar estado actualizado
 with open(archivo_estado, "w") as f:
     json.dump(estado, f)
+
