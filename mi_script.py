@@ -10,9 +10,9 @@ import numpy as np
 import pytz
 import requests  # Para enviar Telegram
 
-# 📌 Configuración de Telegram
-TELEGRAM_TOKEN = "TU_TOKEN_AQUI"
-TELEGRAM_CHAT_ID = TU_CHAT_ID_AQUI
+# 📌 Configuración de Telegram desde Secrets
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = int(os.getenv("TELEGRAM_CHAT_ID"))
 
 def enviar_imagen(ruta_imagen, caption=""):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
