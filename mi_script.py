@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 # --- Merval unificado: diario o intradiario según hora Argentina ---
+import os
 import yfinance as yf
 import pandas as pd
+import numpy as np
+import requests
 import matplotlib
 matplotlib.use('Agg')  # Evita gráficos interactivos
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-import numpy as np
 import pytz
-import requests  # Para enviar Telegram
 
 # 📌 Configuración de Telegram desde Secrets
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
