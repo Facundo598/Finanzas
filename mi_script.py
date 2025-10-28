@@ -41,10 +41,17 @@ if modo == "intradiario":
     df_diario = yf.download("^MERV", start=hace_180_dias, end=ahora, auto_adjust=True)[['Close']].rename(columns={'Close':'Merval'})
     df_intradia = yf.download("^MERV", period="1d", interval="1m", auto_adjust=True)[['Close']].rename(columns={'Close':'Merval'})
     if not df_intradia.empty:
+        # Si devuelve una Serie (por columnas tipo MultiIndex), convertimos a float
         ultimo_valor = df_intradia['Merval'].iloc[-1]
+        if isinstance(ultimo_valor, pd.Series):
+            ultimo_valor = float(ultimo_valor.values[0])
+        else:
+            ultimo_valor = float(ultimo_valor)
+        
         fecha_actual = df_intradia.index[-1].normalize()
         df_diario.loc[fecha_actual] = ultimo_valor
         print(f"Último valor intradiario: {ultimo_valor}")
+    
     df = df_diario.copy()
 else:
     df = yf.download("^MERV", start=hace_180_dias, end=ahora, auto_adjust=True)[['Close']].rename(columns={'Close':'Merval'})
