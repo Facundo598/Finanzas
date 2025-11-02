@@ -3,9 +3,9 @@ name: Merval a Telegram
 on:
   schedule:
     # Se ejecuta todos los días a las 10:00, 12:00 y 15:00 hs de Argentina
-    - cron: '0 13 * * *'  # 10:00 ARG
-    - cron: '0 15 * * *'  # 12:00 ARG
-    - cron: '0 18 * * *'  # 15:00 ARG
+    - cron: '0 13 * * 1-5'  # 10:00 ARG
+    - cron: '0 15 * * 1-5'  # 12:00 ARG
+    - cron: '0 18 * * 1-5'  # 15:00 ARG
   workflow_dispatch:  # Permite ejecución manual
 
 jobs:
