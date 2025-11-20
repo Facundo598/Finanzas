@@ -69,11 +69,19 @@ df['HMA10'] = HMA(df['Merval'], 10)
 df['MA15'] = df['Merval'].rolling(window=15).mean()
 
 # 🔹 MACD
-ema12 = df['Merval'].ewm(span=12, adjust=False).mean()
-ema26 = df['Merval'].ewm(span=26, adjust=False).mean()
-df['MACD'] = ema12 - ema26
-df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
-df['Histograma'] = df['MACD'] - df['Signal']
+#ema12 = df['Merval'].ewm(span=12, adjust=False).mean()
+#ema26 = df['Merval'].ewm(span=26, adjust=False).mean()
+#df['MACD'] = ema12 - ema26
+#df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
+#df['Histograma'] = df['MACD'] - df['Signal']
+
+hist = df['Histograma']
+delta = hist.diff()
+condiciones = [(hist >= 0) & (delta > 0), (hist >= 0) & (delta <= 0), (hist < 0) & (delta < 0), (hist < 0) & (delta >= 0)]
+rellenos = ['green', 'none', 'red', 'none']
+bordes   = ['green', 'green', 'red', 'red']
+face = np.select(condiciones, rellenos, default='gray')
+edge = np.select(condiciones, bordes,   default='black')
 
 # 🔹 RSI
 def RSI(series, period=14):
@@ -94,7 +102,7 @@ sobreventa_fechas = df[df['RSI'] < 30].index
 # 🔹 --- GRAFICAR ---
 fig, (ax1, ax2, ax3) = plt.subplots(
     3, 1, figsize=(14, 11), sharex=True,
-    gridspec_kw={'height_ratios': [3, 1, 1]}
+    gridspec_kw={'height_ratios': [1, 1, 1]}
 )
 
 ax1.plot(df['Merval'], label='Merval', color='blue')
@@ -105,13 +113,21 @@ ax1.set_ylabel('Precio')
 ax1.legend()
 ax1.grid(True)
 
-ax2.plot(df['MACD'], label='MACD', color='purple')
-ax2.plot(df['Signal'], label='Señal', color='green')
-ax2.bar(df.index, df['Histograma'], label='Histograma', color='gray', alpha=0.4)
-ax2.axhline(0, color='black', linewidth=1)
+ax2.bar(df.index, hist, width=0.9, linewidth=1.2, edgecolor=edge, facecolor=face)
+ax2.plot(df['MACD'], label='MACD (12,26)', color='purple')
+ax2.plot(df['Signal'], label='Señal (9)', color='green')
+ax2.axhline(0, color='black')
 ax2.set_ylabel('MACD')
 ax2.legend()
 ax2.grid(True)
+
+#ax2.plot(df['MACD'], label='MACD', color='purple')
+#ax2.plot(df['Signal'], label='Señal', color='green')
+#ax2.bar(df.index, df['Histograma'], label='Histograma', color='gray', alpha=0.4)
+#ax2.axhline(0, color='black', linewidth=1)
+#ax2.set_ylabel('MACD')
+#ax2.legend()
+#ax2.grid(True)
 
 ax3.plot(df['RSI'], label='RSI', color='blue', linewidth=1.5)
 ax3.axhline(70, color='red', linestyle='--')
@@ -128,14 +144,14 @@ color_sobrecompra = "green" if modo=="cierre" else "red"
 color_sobreventa = "red" if modo=="cierre" else "green"
 
 for fecha in sobrecompra_fechas:
-    ax1.axvline(fecha, color=color_sobrecompra, linestyle=':', alpha=0.6, linewidth=3)
-    ax2.axvline(fecha, color=color_sobrecompra, linestyle=':', alpha=0.6, linewidth=3)
-    ax3.axvline(fecha, color=color_sobrecompra, linestyle=':', alpha=0.6, linewidth=3)
+    ax1.axvline(fecha, color=color_sobrecompra, linestyle=':', alpha=0.6, linewidth=1.7)
+    ax2.axvline(fecha, color=color_sobrecompra, linestyle=':', alpha=0.6, linewidth=1.7)
+    ax3.axvline(fecha, color=color_sobrecompra, linestyle=':', alpha=0.6, linewidth=1.7)
 
 for fecha in sobreventa_fechas:
-    ax1.axvline(fecha, color=color_sobreventa, linestyle=':', alpha=0.6, linewidth=3)
-    ax2.axvline(fecha, color=color_sobreventa, linestyle=':', alpha=0.6, linewidth=3)
-    ax3.axvline(fecha, color=color_sobreventa, linestyle=':', alpha=0.6, linewidth=3)
+    ax1.axvline(fecha, color=color_sobreventa, linestyle=':', alpha=0.6, linewidth=1.7)
+    ax2.axvline(fecha, color=color_sobreventa, linestyle=':', alpha=0.6, linewidth=1.7)
+    ax3.axvline(fecha, color=color_sobreventa, linestyle=':', alpha=0.6, linewidth=1.7)
 
 plt.tight_layout()
 
