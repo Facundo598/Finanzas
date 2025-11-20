@@ -69,11 +69,11 @@ df['HMA10'] = HMA(df['Merval'], 10)
 df['MA15'] = df['Merval'].rolling(window=15).mean()
 
 # 🔹 MACD
-#ema12 = df['Merval'].ewm(span=12, adjust=False).mean()
-#ema26 = df['Merval'].ewm(span=26, adjust=False).mean()
-#df['MACD'] = ema12 - ema26
-#df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
-#df['Histograma'] = df['MACD'] - df['Signal']
+ema12 = df['Merval'].ewm(span=12, adjust=False).mean()
+ema26 = df['Merval'].ewm(span=26, adjust=False).mean()
+df['MACD'] = ema12 - ema26
+df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
+df['Histograma'] = df['MACD'] - df['Signal']
 
 hist = df['Histograma']
 delta = hist.diff()
