@@ -23,39 +23,26 @@ def enviar_imagen(ruta_imagen, caption=""):
 # 🔹 Hora actual en Argentina
 argentina_tz = pytz.timezone("America/Argentina/Buenos_Aires")
 ahora = datetime.now(argentina_tz)
-hora_actual = ahora.hour + ahora.minute/60
+#hora_actual = ahora.hour + ahora.minute/60
 
 # 🔹 Definir período histórico
 hace_180_dias = ahora - timedelta(days=180)
 
-# 🔹 Selección de modo: intradiario o cierre diario
-if 11 <= hora_actual < 17:
-    modo = "intradiario"
-else:
-    modo = "cierre"
+# 🔹 Descargar histórico diario de 180 días
+df = yf.download("^MERV", start=hace_180_dias, end=ahora, auto_adjust=True)[['Close']]
+df = df.rename(columns={'Close':'Merval'})
+# 🔹 Descargar último intradiario (1 minuto)
+df_intradia = yf.download("^MERV", period="1d", interval="1m", auto_adjust=True)[['Close']]
+df_intradia = df_intradia.rename(columns={'Close':'Merval'})
 
-print(f"Modo seleccionado: {modo} | Hora actual: {ahora.strftime('%H:%M')}")
+if not df_intradia.empty:
+    ultimo_valor = float(df_intradia['Merval'].iloc[-1])
+    # Normalizar fecha y quitar timezone
+    fecha_actual = df_intradia.index[-1]
+    fecha_actual = fecha_actual.tz_localize(None).normalize()
+    df.loc[fecha_actual] = ultimo_valor
 
-# 🔹 Descargar datos
-if modo == "intradiario":
-    df_diario = yf.download("^MERV", start=hace_180_dias, end=ahora, auto_adjust=True)[['Close']].rename(columns={'Close':'Merval'})
-    df_intradia = yf.download("^MERV", period="1d", interval="1m", auto_adjust=True)[['Close']].rename(columns={'Close':'Merval'})
-    if not df_intradia.empty:
-        # Si devuelve una Serie (por columnas tipo MultiIndex), convertimos a float
-        ultimo_valor = df_intradia['Merval'].iloc[-1]
-        if isinstance(ultimo_valor, pd.Series):
-            ultimo_valor = float(ultimo_valor.values[0])
-        else:
-            ultimo_valor = float(ultimo_valor)
-        
-        fecha_actual = df_intradia.index[-1].normalize()
-        df_diario.loc[fecha_actual] = ultimo_valor
-        print(f"Último valor intradiario: {ultimo_valor}")
-    
-    df = df_diario.copy()
-else:
-    df = yf.download("^MERV", start=hace_180_dias, end=ahora, auto_adjust=True)[['Close']].rename(columns={'Close':'Merval'})
-
+# --- Indicadores -----------------------------------------------------------------
 # 🔹 Función HMA
 def HMA(series, period):
     half_length = int(period / 2)
@@ -121,14 +108,6 @@ ax2.set_ylabel('MACD')
 ax2.legend()
 ax2.grid(True)
 
-#ax2.plot(df['MACD'], label='MACD', color='purple')
-#ax2.plot(df['Signal'], label='Señal', color='green')
-#ax2.bar(df.index, df['Histograma'], label='Histograma', color='gray', alpha=0.4)
-#ax2.axhline(0, color='black', linewidth=1)
-#ax2.set_ylabel('MACD')
-#ax2.legend()
-#ax2.grid(True)
-
 ax3.plot(df['RSI'], label='RSI', color='blue', linewidth=1.5)
 ax3.axhline(70, color='red', linestyle='--')
 ax3.axhline(30, color='green', linestyle='--')
@@ -140,8 +119,8 @@ ax3.set_xlabel('Fecha')
 ax3.legend()
 ax3.grid(True)
 
-color_sobrecompra = "green" if modo=="cierre" else "red"
-color_sobreventa = "red" if modo=="cierre" else "green"
+color_sobrecompra = "red"
+color_sobreventa = "green"
 
 for fecha in sobrecompra_fechas:
     ax1.axvline(fecha, color=color_sobrecompra, linestyle=':', alpha=0.6, linewidth=1.7)
