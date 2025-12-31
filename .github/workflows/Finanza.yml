@@ -1,14 +1,12 @@
 name: Merval a Telegram
 
 on:
-  workflow_dispatch: # Quitar esta linea si se quiere sacar la ejecucion en manual y descomentar
-  # los siguientes shcudule con los diempos de ejecucion
-#  schedule:
-#    # Se ejecuta todos los días a las 12:00 y 15:00 hs de Argentina
-#    # Solo de lunes (1) a viernes (5)
-#    - cron: '0 15 * * 1-5'  # 12:00 ARG
-#    - cron: '0 18 * * 1-5'  # 15:00 ARG
-#  workflow_dispatch:  # Permite ejecución manual
+  schedule:
+    # Se ejecuta todos los días a las 12:00 y 15:00 hs de Argentina
+    # Solo de lunes (1) a viernes (5)
+    - cron: '0 15 * * 1-5'  # 12:00 ARG
+    - cron: '0 18 * * 1-5'  # 15:00 ARG
+  workflow_dispatch:  # Permite ejecución manual
 
 jobs:
   run-script:
