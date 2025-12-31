@@ -1,4 +1,4 @@
-name: RSI a Telegram
+name: RSIaTelegram
 
 on:
   schedule:
